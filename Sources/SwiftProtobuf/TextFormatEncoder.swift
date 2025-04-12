@@ -210,9 +210,16 @@ internal struct TextFormatEncoder {
         append(staticText: value ? "true" : "false")
     }
 
-    mutating func putStringValue(value: String) {
+    mutating func putStringValue(value: String, limit: Int?) {
         data.append(asciiDoubleQuote)
-        for c in value.unicodeScalars {
+        let length = value.unicodeScalars.count
+        let maxLength: Int
+        if let limit, length > limit + 20 {
+            maxLength = limit
+        } else {
+            maxLength = length
+        }
+        for c in value.unicodeScalars.prefix(maxLength) {
             switch c.value {
             // Special two-byte escapes
             case 8:
@@ -252,13 +259,20 @@ internal struct TextFormatEncoder {
                 data.append(0x80 + UInt8(truncatingIfNeeded: c.value & 0x3f))
             }
         }
+        if maxLength != length {
+            append(text: "... (\(length) chars)")
+        }
         data.append(asciiDoubleQuote)
     }
 
-    mutating func putBytesValue(value: Data) {
+    mutating func putBytesValue(value: Data, limit: Int?) {
         data.append(asciiDoubleQuote)
         value.withUnsafeBytes { (body: UnsafeRawBufferPointer) in
             if let p = body.baseAddress, body.count > 0 {
+                if let limit, body.count > limit {
+                    append(text: "(\(body.count) bytes)")
+                    return
+                }
                 for i in 0..<body.count {
                     let c = p[i]
                     switch c {

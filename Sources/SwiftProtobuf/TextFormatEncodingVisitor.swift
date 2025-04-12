@@ -179,7 +179,7 @@ internal struct TextFormatEncodingVisitor: Visitor {
                 }
                 if encodeAsBytes {
                     encoder.startRegularField()
-                    encoder.putBytesValue(value: bytes)
+                    encoder.putBytesValue(value: bytes, limit: options.bytesLimit)
                     encoder.endRegularField()
                 }
             case .startGroup:
@@ -249,14 +249,14 @@ internal struct TextFormatEncodingVisitor: Visitor {
     mutating func visitSingularStringField(value: String, fieldNumber: Int) throws {
         emitFieldName(lookingUp: fieldNumber)
         encoder.startRegularField()
-        encoder.putStringValue(value: value)
+        encoder.putStringValue(value: value, limit: options.stringLimit)
         encoder.endRegularField()
     }
 
     mutating func visitSingularBytesField(value: Data, fieldNumber: Int) throws {
         emitFieldName(lookingUp: fieldNumber)
         encoder.startRegularField()
-        encoder.putBytesValue(value: value)
+        encoder.putBytesValue(value: value, limit: options.bytesLimit)
         encoder.endRegularField()
     }
 
@@ -330,7 +330,7 @@ internal struct TextFormatEncodingVisitor: Visitor {
     internal mutating func visitAnyJSONBytesField(value: Data) {
         encoder.indent()
         encoder.append(staticText: "#json: ")
-        encoder.putBytesValue(value: value)
+        encoder.putBytesValue(value: value, limit: nil)
         encoder.append(staticText: "\n")
     }
 
@@ -440,7 +440,7 @@ internal struct TextFormatEncodingVisitor: Visitor {
         for v in value {
             encoder.emitFieldName(name: fieldName)
             encoder.startRegularField()
-            encoder.putStringValue(value: v)
+            encoder.putStringValue(value: v, limit: options.stringLimit)
             encoder.endRegularField()
         }
     }
@@ -451,7 +451,7 @@ internal struct TextFormatEncodingVisitor: Visitor {
         for v in value {
             encoder.emitFieldName(name: fieldName)
             encoder.startRegularField()
-            encoder.putBytesValue(value: v)
+            encoder.putBytesValue(value: v, limit: options.bytesLimit)
             encoder.endRegularField()
         }
     }

@@ -18,5 +18,17 @@ public struct TextFormatEncodingOptions: Sendable {
     /// Default: Do print unknown fields using numeric notation
     public var printUnknownFields: Bool = true
 
-    public init() {}
+    /// Limit for string values, useful for logging purposes
+    /// Default: No limit
+    public var stringLimit: Int?
+
+    /// Limit for bytes values, useful for logging purposes
+    /// Default: No limit
+    public var bytesLimit: Int?
+
+    public init(printUnknownFields: Bool = true, stringLimit: Int? = nil, bytesLimit: Int? = nil) {
+        self.printUnknownFields = printUnknownFields
+        self.stringLimit = stringLimit
+        self.bytesLimit = bytesLimit
+    }
 }
